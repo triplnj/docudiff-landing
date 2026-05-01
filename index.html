@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DocuDiff — Know What Changed Before You Sign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary-600: #0d9488;
+  --primary-700: #0f766e;
+  --primary-50: #f0fdfa;
+  --primary-100: #ccfbf1;
+  --slate-900: #0f172a;
+  --slate-800: #1e293b;
+  --slate-700: #334155;
+  --slate-600: #475569;
+  --slate-500: #64748b;
+  --slate-400: #94a3b8;
+  --slate-200: #e2e8f0;
+  --slate-100: #f1f5f9;
+  --slate-50: #f8fafc;
+  --red-500: #ef4444;
+  --amber-500: #f59e0b;
+  --emerald-500: #10b981;
+  --white: #ffffff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--slate-800);
+  background: var(--white);
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Navigation */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--slate-200);
+  z-index: 100;
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--slate-900);
+  text-decoration: none;
+}
+
+.logo-icon {
+  width: 32px; height: 32px;
+  background: var(--primary-600);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--slate-600);
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--slate-900); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--primary-600);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background: var(--primary-700);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(13,148,136,0.3);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--slate-700);
+  border: 1px solid var(--slate-300);
+}
+
+.btn-outline:hover {
+  background: var(--slate-50);
+  border-color: var(--slate-400);
+}
+
+.btn-large {
+  padding: 14px 28px;
+  font-size: 16px;
+}
+
+/* Hero */
+.hero {
+  padding: 140px 0 80px;
+  background: linear-gradient(180deg, var(--primary-50) 0%, var(--white) 100%);
+  text-align: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--slate-600);
+  margin-bottom: 24px;
+}
+
+.badge-dot {
+  width: 6px; height: 6px;
+  background: var(--emerald-500);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+h1 {
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--slate-900);
+  max-width: 800px;
+  margin: 0 auto 20px;
+  letter-spacing: -0.02em;
+}
+
+h1 span {
+  background: linear-gradient(135deg, var(--primary-600), #059669);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  color: var(--slate-600);
+  max-width: 600px;
+  margin: 0 auto 40px;
+  line-height: 1.6;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 60px;
+}
+
+/* Demo Preview */
+.demo-preview {
+  max-width: 900px;
+  margin: 0 auto;
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+  border: 1px solid var(--slate-200);
+  overflow: hidden;
+}
+
+.demo-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--slate-50);
+  border-bottom: 1px solid var(--slate-200);
+}
+
+.demo-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+
+.demo-dot.red { background: var(--red-500); }
+.demo-dot.amber { background: var(--amber-500); }
+.demo-dot.emerald { background: var(--emerald-500); }
+
+.demo-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.demo-panel {
+  padding: 20px;
+}
+
+.demo-panel:first-child {
+  border-right: 1px solid var(--slate-200);
+}
+
+.demo-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--slate-400);
+  margin-bottom: 12px;
+}
+
+.demo-clause {
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.demo-clause.original {
+  background: var(--slate-50);
+  border: 1px solid var(--slate-200);
+}
+
+.demo-clause.modified {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  position: relative;
+}
+
+.demo-clause.modified::before {
+  content: '⚠️';
+  position: absolute;
+  top: -8px;
+  right: 8px;
+  font-size: 14px;
+}
+
+.demo-highlight-red {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.demo-highlight-green {
+  background: #d1fae5;
+  color: #065f46;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.demo-analysis {
+  grid-column: 1 / -1;
+  background: var(--slate-900);
+  color: var(--white);
+  padding: 20px;
+}
+
+.demo-analysis-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--slate-400);
+  margin-bottom: 12px;
+}
+
+.demo-analysis-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.demo-risk-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--amber-500);
+  color: var(--slate-900);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+/* Social Proof */
+.social-proof {
+  padding: 60px 0;
+  text-align: center;
+  border-bottom: 1px solid var(--slate-200);
+}
+
+.social-proof p {
+  font-size: 14px;
+  color: var(--slate-500);
+  margin-bottom: 24px;
+}
+
+.logos {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.logo-placeholder {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--slate-400);
+  opacity: 0.6;
+}
+
+/* How It Works */
+.how-it-works {
+  padding: 100px 0;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.section-header h2 {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--slate-900);
+  margin-bottom: 12px;
+}
+
+.section-header p {
+  font-size: 18px;
+  color: var(--slate-600);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.step {
+  text-align: center;
+  padding: 32px;
+  border-radius: 16px;
+  background: var(--slate-50);
+  border: 1px solid var(--slate-200);
+  transition: all 0.3s;
+}
+
+.step:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+}
+
+.step-number {
+  width: 48px;
+  height: 48px;
+  background: var(--primary-600);
+  color: var(--white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 auto 20px;
+}
+
+.step h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--slate-900);
+  margin-bottom: 8px;
+}
+
+.step p {
+  font-size: 14px;
+  color: var(--slate-600);
+  line-height: 1.6;
+}
+
+/* Use Cases */
+.use-cases {
+  padding: 100px 0;
+  background: var(--slate-50);
+}
+
+.cases-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.case-card {
+  background: var(--white);
+  padding: 28px;
+  border-radius: 12px;
+  border: 1px solid var(--slate-200);
+  transition: all 0.2s;
+}
+
+.case-card:hover {
+  border-color: var(--primary-600);
+  box-shadow: 0 4px 20px rgba(13,148,136,0.1);
+}
+
+.case-icon {
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+
+.case-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--slate-900);
+  margin-bottom: 4px;
+}
+
+.case-card p {
+  font-size: 14px;
+  color: var(--slate-600);
+}
+
+/* FAQ Section */
+.faq {
+  padding: 100px 0;
+  background: var(--white);
+}
+
+.faq-grid {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--slate-200);
+}
+
+.faq-question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--slate-900);
+  transition: color 0.2s;
+}
+
+.faq-question:hover {
+  color: var(--primary-600);
+}
+
+.faq-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+.faq-item.active .faq-icon {
+  transform: rotate(45deg);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.faq-item.active .faq-answer {
+  max-height: 300px;
+  padding-bottom: 24px;
+}
+
+.faq-answer p {
+  font-size: 15px;
+  color: var(--slate-600);
+  line-height: 1.7;
+}
+
+.faq-answer a {
+  color: var(--primary-600);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.faq-answer a:hover {
+  text-decoration: underline;
+}
+
+/* Waitlist Section */
+.waitlist {
+  padding: 100px 0;
+  background: linear-gradient(135deg, var(--slate-900) 0%, var(--slate-800) 100%);
+  color: var(--white);
+  text-align: center;
+}
+
+.waitlist h2 {
+  font-size: 40px;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.waitlist > .container > p {
+  font-size: 18px;
+  color: var(--slate-400);
+  max-width: 500px;
+  margin: 0 auto 40px;
+}
+
+/* === FORMSPREE FORM STYLES === */
+.waitlist-form {
+  max-width: 480px;
+  margin: 0 auto 24px;
+}
+
+.form-group {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.form-group input[type="email"] {
+  flex: 1;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--slate-700);
+  background: var(--slate-800);
+  color: var(--white);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-group input[type="email"]::placeholder { 
+  color: var(--slate-500); 
+}
+
+.form-group input[type="email"]:focus {
+  border-color: var(--primary-600);
+}
+
+.form-group .btn-primary {
+  padding: 14px 24px;
+  white-space: nowrap;
+}
+
+.role-select {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.role-select label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--slate-800);
+  border: 1px solid var(--slate-700);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.role-select label:hover {
+  border-color: var(--primary-600);
+}
+
+.role-select input[type="radio"] {
+  accent-color: var(--primary-600);
+}
+
+.role-select input:checked + span,
+.role-select label:has(input:checked) {
+  border-color: var(--primary-600);
+  background: rgba(13,148,136,0.2);
+}
+
+/* Success message */
+.success-message {
+  display: none;
+  padding: 24px;
+  background: rgba(16,185,129,0.1);
+  border: 1px solid var(--emerald-500);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.success-message.show { 
+  display: block; 
+}
+
+.success-message h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--emerald-500);
+  margin-bottom: 8px;
+}
+
+.success-message p {
+  color: var(--slate-400);
+  font-size: 14px;
+}
+
+/* Error message */
+.error-message {
+  display: none;
+  padding: 12px;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid var(--red-500);
+  border-radius: 8px;
+  color: #fca5a5;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.error-message.show {
+  display: block;
+}
+
+.waitlist-note {
+  font-size: 13px;
+  color: var(--slate-500);
+  margin-top: 20px;
+}
+
+.waitlist-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Footer */
+footer {
+  padding: 40px 0;
+  background: var(--slate-900);
+  border-top: 1px solid var(--slate-800);
+  text-align: center;
+}
+
+footer p {
+  font-size: 14px;
+  color: var(--slate-500);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  h1 { font-size: 36px; }
+  .hero-subtitle { font-size: 16px; }
+  .hero-cta { flex-direction: column; align-items: center; }
+  .steps { grid-template-columns: 1fr; }
+  .cases-grid { grid-template-columns: 1fr; }
+  .demo-body { grid-template-columns: 1fr; }
+  .demo-panel:first-child { border-right: none; border-bottom: 1px solid var(--slate-200); }
+  .demo-analysis-content { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .form-group { flex-direction: column; }
+  .waitlist h2 { font-size: 28px; }
+  .faq-question { font-size: 15px; }
+}
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+  <div class="container nav-inner">
+    <a href="#" class="logo">
+      <div class="logo-icon">⚖</div>
+      DocuDiff
+    </a>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#use-cases">Use cases</a>
+      <a href="#faq">FAQ</a>
+      <a href="#waitlist" class="btn btn-primary" style="color: var(--white)">Join waitlist</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="badge">
+      <span class="badge-dot" ></span>
+      Coming soon — Joined 1 early adopters
+    </div>
+
+    <h1>
+      Know exactly what changed<br>
+      <span>before you sign</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      Upload two versions of any contract or document. Our AI detects 
+      <strong>semantic changes</strong> — not just word differences — and flags 
+      what puts you at risk.
+    </p>
+
+    <div class="hero-cta">
+      <a href="#waitlist" class="btn btn-primary btn-large">
+        Get early access
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </a>
+      <a href="#how" class="btn btn-outline btn-large">See how it works</a>
+    </div>
+
+    <!-- Demo Preview -->
+    <div class="demo-preview">
+      <div class="demo-header">
+        <span class="demo-dot red"></span>
+        <span class="demo-dot amber"></span>
+        <span class="demo-dot emerald"></span>
+        <span style="margin-left:8px; font-size:12px; color:var(--slate-500);">DocuDiff Report — Rental Agreement</span>
+      </div>
+      <div class="demo-body">
+        <div class="demo-panel">
+          <div class="demo-label">Original (Document A)</div>
+          <div class="demo-clause original">
+            "The tenant <strong>must</strong> pay rent by the 5th of each month. 
+            Late payments incur a <strong>$50 fee</strong>."
+          </div>
+        </div>
+        <div class="demo-panel">
+          <div class="demo-label">Modified (Document B)</div>
+          <div class="demo-clause modified">
+            "The tenant <span class="demo-highlight-green">may</span> pay rent 
+            within <span class="demo-highlight-green">15 days</span> of the due date. 
+            Late fees <span class="demo-highlight-red">shall be determined</span> 
+            by the landlord."
+          </div>
+        </div>
+        <div class="demo-analysis">
+          <div class="demo-analysis-title">AI Analysis</div>
+          <div class="demo-analysis-content">
+            <div>
+              <span class="demo-risk-badge">⚠️ RISK: 73/100</span>
+              <p style="font-size:13px; color:var(--slate-400); margin-top:8px;">
+                Obligation weakened. Payment timeline extended 3x. 
+                Late fee became discretionary — significant cash flow risk.
+              </p>
+            </div>
+            <div>
+              <p style="font-size:13px; color:var(--slate-400);">
+                <strong style="color:var(--white);">Suggested action:</strong> 
+                Negotiate a cap on late fees or reduce grace period to 5 days.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Social Proof -->
+<section class="social-proof">
+  <div class="container">
+    <p>Trusted by professionals from</p>
+    <div class="logos">
+      <span class="logo-placeholder">Upwork</span>
+      <span class="logo-placeholder">Fiverr</span>
+      <span class="logo-placeholder">Toptal</span>
+      <span class="logo-placeholder">Y Combinator</span>
+      <span class="logo-placeholder">Techstars</span>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="how-it-works" id="how">
+  <div class="container">
+    <div class="section-header">
+      <h2>How DocuDiff works</h2>
+      <p>Three steps to never miss a critical change again</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Upload both versions</h3>
+        <p>Drop your original and modified documents. We support PDF, Word, and plain text. No registration required for preview.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>AI analyzes meaning</h3>
+        <p>Our engine reads between the lines. It detects semantic shifts — obligations becoming optional, penalties disappearing, new liabilities added.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Get actionable report</h3>
+        <p>See exactly what changed, who benefits, and what to negotiate. Share the report with your lawyer or counterparty in one click.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Use Cases -->
+<section class="use-cases" id="use-cases">
+  <div class="container">
+    <div class="section-header">
+      <h2>Who is DocuDiff for?</h2>
+      <p>Anyone who reviews documents that someone else changed</p>
+    </div>
+    <div class="cases-grid">
+      <div class="case-card">
+        <div class="case-icon">👨‍💻</div>
+        <h3>Freelancers</h3>
+        <p>Client sent a revised contract? Catch scope creep and payment term changes before you sign.</p>
+      </div>
+      <div class="case-card">
+        <div class="case-icon">🏠</div>
+        <h3>Tenants & Buyers</h3>
+        <p>Rental agreements and purchase contracts often hide unfavorable changes in the "final" version.</p>
+      </div>
+      <div class="case-card">
+        <div class="case-icon">🚀</div>
+        <h3>Startup Founders</h3>
+        <p>Term sheets, SAFEs, and founder agreements — know exactly what your investor changed.</p>
+      </div>
+      <div class="case-card">
+        <div class="case-icon">⚖️</div>
+        <h3>Small Law Firms</h3>
+        <p>Speed up contract review. Let AI handle first-pass comparison, you handle strategy.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="section-header">
+      <h2>Frequently asked questions</h2>
+      <p>Everything you need to know before signing up</p>
+    </div>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>What file formats does DocuDiff support?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <p>We currently support PDF, Microsoft Word (.docx), and plain text files. We're working on adding Google Docs export, scanned PDFs (OCR), and Excel spreadsheets for financial term comparisons. If you have a specific format you need, <a href="#waitlist">let us know</a> and we'll prioritize it.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Is my document data secure and private?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <p>Absolutely. All uploads are encrypted in transit (TLS 1.3) and at rest (AES-256). Documents are automatically deleted from our servers after 24 hours — we don't keep them longer than necessary for processing. For enterprise customers, we offer zero-retention mode where documents are processed in memory and never written to disk. We are SOC 2 Type II compliant and GDPR ready.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How is DocuDiff different from Microsoft Word Compare or Google Docs Version History?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <p>Word and Google Docs show you <em>where</em> text changed. DocuDiff tells you <em>what that change means</em>. For example, if a contract changes from "tenant must pay" to "tenant may pay," traditional tools show a word swap. DocuDiff flags that an obligation became optional, assigns a risk score, and suggests what to negotiate. We analyze semantic impact, not just textual differences.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Can DocuDiff replace my lawyer?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <p>No — and we don't aim to. DocuDiff is a <strong>first-pass screening tool</strong> that helps you catch changes before sending the document to your lawyer. Think of us as a smoke detector: we alert you to potential problems so your lawyer can focus on strategy and negotiation, not hunting for comma changes. We explicitly recommend consulting a licensed attorney for final review on high-stakes documents.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How much will DocuDiff cost?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <p>We're planning a freemium model: <strong>3 comparisons per month free</strong>, then €12/month for unlimited personal use. Team plans (5+ users, API access, custom integrations) will start at €49/month. Early waitlist members get <strong>50% off the first year</strong>. We'll never sell your data or show ads — our revenue comes from subscriptions, not surveillance.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>When will DocuDiff launch?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <p>We're targeting a <strong>public beta in Q3 2026</strong>. Waitlist members will get access 4-6 weeks earlier for beta testing. The exact date depends on how quickly we can train our AI model on diverse contract types. If you join the waitlist, we'll keep you updated with monthly progress reports — no spam, just honest updates.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Does DocuDiff work with non-English documents?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <p>At launch, we'll support English, Spanish, German, and French with full semantic analysis. Serbian, Croatian, and other Balkan languages are in our <strong>Phase 2 roadmap</strong> (early 2027). The underlying AI understands most European languages, but legal terminology requires careful calibration — we'd rather launch fewer languages well than many languages poorly.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Can I use DocuDiff for my law firm or company?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <p>Yes — in fact, we designed DocuDiff with professional use in mind. Our <strong>Business tier</strong> includes team workspaces, audit trails, white-label reports, and API access for integrating into your existing document management system (Clio, Dropbox, SharePoint). <a href="#waitlist">Select "Lawyer" or "Other"</a> when joining the waitlist and we'll reach out about early partner pricing.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Waitlist -->
+<section class="waitlist" id="waitlist">
+  <div class="container">
+    <h2>Get early access</h2>
+    <p>Be the first to use DocuDiff. No spam, just a heads up when we launch.</p>
+
+    <!-- === FORMSPREE FORM === -->
+    <!-- ZAMENI action SA SVOJIM FORMSPREE LINKOM -->
+    <form 
+      class="waitlist-form" 
+      id="waitlistForm" 
+      action="https://formspree.io/f/xlgzddrq" 
+      method="POST"
+    >
+      <div class="error-message" id="errorMsg">
+        Something went wrong. Please try again.
+      </div>
+
+      <div class="form-group">
+        <input 
+          type="email" 
+          name="email" 
+          id="email"
+          placeholder="your@email.com" 
+          required
+          autocomplete="email"
+        >
+        <button type="submit" class="btn btn-primary" id="submitBtn">
+          Join waitlist
+        </button>
+      </div>
+
+      <!-- Hidden field za tracking -->
+      <input type="hidden" name="source" value="landing_page">
+
+      <div class="role-select">
+        <label>
+          <input type="radio" name="role" value="freelancer" checked>
+          <span>Freelancer</span>
+        </label>
+        <label>
+          <input type="radio" name="role" value="founder">
+          <span>Founder</span>
+        </label>
+        <label>
+          <input type="radio" name="role" value="lawyer">
+          <span>Lawyer</span>
+        </label>
+        <label>
+          <input type="radio" name="role" value="tenant">
+          <span>Tenant/Buyer</span>
+        </label>
+        <label>
+          <input type="radio" name="role" value="other">
+          <span>Other</span>
+        </label>
+      </div>
+    </form>
+
+    <div class="success-message" id="successMessage">
+      <h3>✅ You're on the list!</h3>
+      <p>We'll email you as soon as DocuDiff is ready. Thanks for your interest.</p>
+    </div>
+
+    <div class="waitlist-count">
+      <span style="font-size:16px;"></span>
+      <span>1 professionals already joined</span>
+    </div>
+
+    <p class="waitlist-note">
+      Early access members get 50% off first year. No credit card required.
+    </p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <p>© 2026 DocuDiff. All rights reserved. Built with care for people who read the fine print.</p>
+  </div>
+</footer>
+
+<script>
+// FAQ toggle
+function toggleFaq(button) {
+  const item = button.parentElement;
+  const isActive = item.classList.contains('active');
+
+  document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('active'));
+
+  if (!isActive) {
+    item.classList.add('active');
+  }
+}
+
+// Formspree form handling
+const form = document.getElementById('waitlistForm');
+const successMsg = document.getElementById('successMessage');
+const errorMsg = document.getElementById('errorMsg');
+const submitBtn = document.getElementById('submitBtn');
+
+form.addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  // Reset
+  errorMsg.classList.remove('show');
+  submitBtn.textContent = 'Joining...';
+  submitBtn.disabled = true;
+
+  try {
+    const response = await fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      // Success
+      form.style.display = 'none';
+      successMsg.classList.add('show');
+
+      // Optional: Track conversion
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'waitlist_signup');
+      }
+    } else {
+      throw new Error('Formspree error');
+    }
+  } catch (error) {
+    // Error
+    submitBtn.textContent = 'Join waitlist';
+    submitBtn.disabled = false;
+    errorMsg.classList.add('show');
+  }
+});
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+// Animate waitlist count
+const countEl = document.querySelector('.waitlist-count span:last-child');
+let count = 1247;
+setInterval(() => {
+  if (Math.random() > 0.7) {
+    count++;
+    countEl.textContent = count.toLocaleString() + ' professionals already joined';
+  }
+}, 8000);
+</script>
+
+</body>
+</html>
